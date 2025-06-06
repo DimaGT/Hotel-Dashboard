@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 type RequestStatus = "PENDING" | "IN_PROGRESS" | "DONE" | "ALL";
-export async function GET(request: Request) {
+
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const hotelId = searchParams.get('hotel_id');
   const status = searchParams.get('status') as RequestStatus | null;
