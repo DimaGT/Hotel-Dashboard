@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { ApiResponse } from '@/types';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const preferredRegion = 'auto';
 
 export async function GET(
   request: NextRequest,
