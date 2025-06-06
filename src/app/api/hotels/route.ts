@@ -6,7 +6,10 @@ export const runtime = 'nodejs';
 export const preferredRegion = 'auto';
 
 export async function GET() {
+  console.log('GET /api/hotels - Starting request');
+  
   try {
+    console.log('GET /api/hotels - Fetching hotels from database');
     const hotels = await prisma.hotel.findMany({
       select: {
         id: true,
@@ -17,11 +20,16 @@ export async function GET() {
       },
     });
 
+    console.log(`GET /api/hotels - Found ${hotels.length} hotels`);
     return NextResponse.json({ data: hotels });
   } catch (error) {
-    console.error('Error fetching hotels:', error);
+    console.error('GET /api/hotels - Error:', error);
     return NextResponse.json(
-      { data: [], error: 'Failed to fetch hotels' },
+      { 
+        data: [], 
+        error: 'Failed to fetch hotels',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
