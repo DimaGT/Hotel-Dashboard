@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RequestType {
+  CLEANING
+  TOWELS
+  LATE_CHECKOUT
+  ROOM_SERVICE
+  MAINTENANCE
+  OTHER
+}
+
+enum RequestStatus {
+  PENDING
+  IN_PROGRESS
+  DONE
+}
+
+model Hotel {
+  id        String    @id @default(uuid())
+  name      String
+  requests  Request[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("hotels")
+}
+
+model Request {
+  id          String        @id @default(uuid())
+  hotelId     String
+  hotel       Hotel         @relation(fields: [hotelId], references: [id])
+  guestName   String
+  requestType RequestType
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([hotelId])
+  @@index([status])
+  @@map("requests")
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./",
+    "noEmit": false,
+    "target": "ES2017"
+  },
+  "include": ["./seed.ts"]
+} 

@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Панель управления запросами гостей
 
-## Getting Started
+## Описание задачи и модель данных
 
-First, run the development server:
+Этот проект представляет собой веб-приложение для управления запросами гостей в отеле. Основные модели данных:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Hotel**: содержит поля `id` и `name`.
+- **Request**: содержит поля `id`, `guestName`, `requestType` (например, "CLEANING", "TOWELS", "LATE_CHECKOUT", "ROOM_SERVICE", "MAINTENANCE", "OTHER"), `status` ("PENDING", "IN_PROGRESS", "DONE"), `createdAt` и связь с отелем.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Инструкция по запуску и деплою
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Локальный запуск
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Клонируйте репозиторий:
+   ```bash
+   git clone <repository-url>
+   cd <project-directory>
+   ```
 
-## Learn More
+2. Установите зависимости:
+   ```bash
+   npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. Настройте переменные окружения:
+   - Создайте файл `.env` в корне проекта со следующим содержимым:
+     ```env
+     DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?sslmode=require"
+     ```
+     (замените USER, PASSWORD, HOST, PORT, DATABASE на свои данные из Neon.tech)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Примените миграции базы данных:
+   ```bash
+   npx prisma migrate deploy
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+5. Запустите сервер разработки:
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+6. Откройте [http://localhost:3000](http://localhost:3000) в браузере.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Деплой на Neon.tech
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Зарегистрируйтесь на [neon.tech](https://neon.tech) и создайте новый проект.
+2. Получите connection string для вашей базы данных.
+3. Обновите файл `.env` с полученным connection string.
+4. Примените миграции:
+   ```bash
+   npx prisma migrate deploy
+   ```
+5. Задеплойте приложение на ваш хостинг (например, Vercel, Netlify и т.д.).
+
+## Бизнес-логика
+
+Проект решает проблему управления запросами гостей в отеле. Администраторы могут просматривать, фильтровать и изменять статус запросов, что позволяет оперативно реагировать на потребности гостей и повышать качество обслуживания.
+
+## UX-решение
+
+- **Фильтрация и сортировка**: Позволяют быстро находить нужные запросы, что критично при большом количестве запросов.
+- **Цветовая индикация**: Помогает визуально различать статусы запросов (например, красный для "PENDING", желтый для "IN_PROGRESS", зеленый для "DONE"), что улучшает удобство использования.
+
+## Мультиарендность
+
+Проект поддерживает мультиарендность, то есть одно приложение может обслуживать несколько отелей. Каждый запрос связан с конкретным отелем, что позволяет администраторам управлять запросами для разных отелей из одного интерфейса.
