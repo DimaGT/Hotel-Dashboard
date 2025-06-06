@@ -48,40 +48,20 @@ const statusFlow: Record<RequestStatus, RequestStatus> = {
 export function RequestsTable({ requests, onStatusChange }: RequestsTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [sortOrder, setSortOrder] = useState<'date' | '-date' | ''>(() => {
+  const [sortOrder, setSortOrder] = useState<'date' | '-date'>(() => {
     const sort = searchParams.get('sort');
-    return (sort === 'date' || sort === '-date' || sort === '') ? sort : '';
+    return sort === '-date' ? '-date' : 'date';
   });
 
   const handleSort = () => {
-    let newOrder: 'date' | '-date' | '';
-    switch (sortOrder) {
-      case '':
-        newOrder = 'date';
-        break;
-      case 'date':
-        newOrder = '-date';
-        break;
-      case '-date':
-        newOrder = '';
-        break;
-      default:
-        newOrder = '';
-    }
-    
+    const newOrder = sortOrder === 'date' ? '-date' : 'date';
     setSortOrder(newOrder);
     const params = new URLSearchParams(searchParams.toString());
-    if (newOrder) {
-      params.set('sort', newOrder);
-    } else {
-      params.delete('sort');
-    }
+    params.set('sort', newOrder);
     router.push(`?${params.toString()}`);
   };
 
   const sortedRequests = [...(requests || [])].sort((a, b) => {
-    if (!sortOrder) return 0;
-    
     const dateA = new Date(a.createdAt).getTime();
     const dateB = new Date(b.createdAt).getTime();
     return sortOrder === 'date' ? dateA - dateB : dateB - dateA;
@@ -109,11 +89,7 @@ export function RequestsTable({ requests, onStatusChange }: RequestsTableProps) 
                 <span>Created At</span>
                 <ChevronDown 
                   className={`w-4 h-4 transition-transform ${
-                    sortOrder === 'date' 
-                      ? 'rotate-180' 
-                      : sortOrder === '-date' 
-                        ? 'rotate-0' 
-                        : 'opacity-50'
+                    sortOrder === 'date' ? 'rotate-180' : 'rotate-0'
                   }`} 
                 />
               </button>
@@ -154,4 +130,4 @@ export function RequestsTable({ requests, onStatusChange }: RequestsTableProps) 
       </table>
     </div>
   );
-} 
+}

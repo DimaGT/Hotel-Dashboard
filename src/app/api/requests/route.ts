@@ -7,14 +7,33 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const preferredRegion = 'auto';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const hotelId = searchParams.get('hotel_id');
+  const status = searchParams.get('status');
+  const sort = searchParams.get('sort');
+
+  if (!hotelId) {
+    return NextResponse.json({ data: [], error: 'Hotel ID is required' }, { status: 400 });
+  }
+
   try {
+    const where = {
+      hotelId,
+      ...(status && status !== 'ALL' ? { status: status as RequestStatus } : {}),
+    };
+
+    const orderBy = sort === 'date' 
+      ? { createdAt: 'desc' as const }
+      : sort === '-date'
+        ? { createdAt: 'asc' as const }
+        : undefined;
+
     const requests = await prisma.request.findMany({
+      where,
+      orderBy,
       include: {
         hotel: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
       },
     });
 
