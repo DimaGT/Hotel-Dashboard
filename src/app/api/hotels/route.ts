@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const preferredRegion = 'auto';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const hotels = await prisma.hotel.findMany({
       select: {
@@ -16,10 +16,6 @@ export async function GET(request: NextRequest) {
         name: 'asc',
       },
     });
-
-    if (!hotels) {
-      return NextResponse.json({ data: [], error: 'No hotels found' }, { status: 404 });
-    }
 
     return NextResponse.json({ data: hotels });
   } catch (error) {

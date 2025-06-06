@@ -1,46 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { RequestStatus } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const preferredRegion = 'auto';
-
-type RequestStatus = "PENDING" | "IN_PROGRESS" | "DONE";
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { status } = await request.json();
-    const { id } = params;
-
-    // Validate status
-    if (!['PENDING', 'IN_PROGRESS', 'DONE'].includes(status)) {
-      return NextResponse.json(
-        { error: 'Invalid status value' },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
+    const { status } = body;
 
     const updatedRequest = await prisma.request.update({
-      where: { id },
-      data: { status },
-      select: {
-        id: true,
-        hotelId: true,
-        guestName: true,
-        requestType: true,
-        status: true,
-        createdAt: true,
+      where: {
+        id: params.id,
+      },
+      data: {
+        status: status as RequestStatus,
+      },
+      include: {
+        hotel: true,
       },
     });
 
-    return NextResponse.json(updatedRequest);
+    return NextResponse.json({ data: updatedRequest });
   } catch (error) {
     console.error('Error updating request status:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Failed to update request status' },
       { status: 500 }
     );
   }
